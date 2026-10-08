@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phiếu Học Tập: Sinh trưởng, phát dục và khả năng sản xuất</title>
+    <style>
+        :root {
+            --primary: #5e35b1;
+            --primary-light: #ede7f6;
+            --success: #4caf50;
+            --danger: #f44336;
+            --text-main: #333;
+            --bg-body: #f4f6f8;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.6;
+            margin: 0;
+            padding: 10px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #5e35b1, #7e57c2);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .header h1 { margin: 0 0 10px 0; font-size: 24px; }
+        .student-info {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .student-info input {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: none;
+            outline: none;
+            font-size: 14px;
+        }
+        .section {
+            padding: 20px;
+            border-bottom: 2px dashed var(--primary-light);
+        }
+        .section-title {
+            color: var(--primary);
+            border-left: 5px solid var(--primary);
+            padding-left: 10px;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        /* Quiz Styles */
+        .question { margin-bottom: 15px; }
+        .options label {
+            display: block;
+            background: var(--primary-light);
+            margin: 5px 0;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .options label:active { background: #d1c4e9; }
+        .options input[type="radio"] { margin-right: 10px; }
+        
+        /* True/False Styles */
+        .tf-table { width: 100%; border-collapse: collapse; }
+        .tf-table th, .tf-table td {
+            border: 1px solid #ddd; padding: 10px; text-align: center;
+        }
+        .tf-table td:first-child { text-align: left; }
+        
+        /* Fill-in-blanks */
+        .fill-blank input {
+            border: 1px solid var(--primary);
+            border-radius: 4px;
+            padding: 5px;
+            width: 120px;
+            text-align: center;
+            color: var(--primary);
+            font-weight: bold;
+        }
+        
+        /* Matching Styles */
+        .matching-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .match-column { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+        .match-item {
+            background: var(--primary-light);
+            border: 2px solid transparent;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .match-item.selected {
+            border-color: var(--primary);
+            transform: scale(1.02);
+            box-shadow: 0 0 8px rgba(94, 53, 177, 0.4);
+        }
+        .match-item.matched {
+            pointer-events: none;
+            color: #000;
+            font-weight: bold;
+        }
+
+        /* Tap to Move (Kéo Thả) */
+        .drag-objects {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            min-height: 50px;
+            padding: 10px;
+            background: #fdfdfd;
+            border-radius: 8px;
+            border: 1px dashed #ccc;
+        }
+        .drag-item {
+            background: #fff;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 10px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            user-select: none;
+        }
+        .drag-item.selected {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-3px);
+        }
+        .drop-zones { display: flex; flex-direction: column; gap: 10px; }
+        .drop-zone {
+            border: 2px dashed #999;
+            background: #fafafa;
+            border-radius: 8px;
+            padding: 15px;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .drop-zone.active { border-color: var(--primary); background: var(--primary-light); }
+        .drop-content { margin-left: 15px; flex-shrink: 0; min-width: 150px; display: flex; justify-content: flex-end;}
+
+        /* Footer / Buttons */
+        .footer { text-align: center; padding: 20px; background: #fff; }
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: 0.3s;
+        }
+        .btn-submit { background: var(--success); color: white; }
+        .btn-reset { background: #9e9e9e; color: white; }
+        .score-board {
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--primary);
+            margin-top: 15px;
+            display: none;
+        }
+
+        /* Animations & Toasts */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+        }
+        .shake { animation: shake 0.4s; border-color: var(--danger) !important; color: var(--danger); }
+        #toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 16px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+        #toast.show { opacity: 1; }
+
+        @media (max-width: 600px) {
+            .matching-container { flex-direction: column; }
+            .drop-zone { flex-direction: column; text-align: center; gap: 10px; }
+            .drop-content { margin-left: 0; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>PHIẾU HỌC TẬP</h1>
+        <p>BÀI 4: CHỌN GIỐNG VẬT NUÔI - PHẦN SINH TRƯỞNG, PHÁT DỤC VÀ KHẢ NĂNG SẢN XUẤT</p>
+        <div class="student-info">
+            <input type="text" placeholder="Họ và tên học sinh..." id="studentName">
+            <input type="text" placeholder="Lớp..." id="studentClass" style="width: 100px;">
+        </div>
+    </div>
+
+    <!-- Mục tiêu -->
+    <div class="section">
+        <h2 class="section-title">🎯 Mục tiêu bài học</h2>
+        <ul>
+            <li>Hiểu rõ khái niệm và phân biệt được sự sinh trưởng và sự phát dục ở vật nuôi.</li>
+            <li>Nêu được các yếu tố ảnh hưởng và ý nghĩa của khả năng sản xuất trong chọn giống.</li>
+        </ul>
+    </div>
+
+    <!-- I. Trắc nghiệm -->
+    <div class="section">
+        <h2 class="section-title">I. Trắc nghiệm (Chọn đáp án đúng nhất)</h2>
+        
+        <div class="question" data-ans="A">
+            <p><b>Câu 1:</b> Sinh trưởng ở vật nuôi được định nghĩa là gì?</p>
+            <div class="options">
+                <label><input type="radio" name="q1" value="A"> A. Là sự tăng lên về khối lượng, thể tích và kích thước của cơ thể.</label>
+                <label><input type="radio" name="q1" value="B"> B. Là sự hình thành và hoàn thiện chức năng của từng cơ quan.</label>
+                <label><input type="radio" name="q1" value="C"> C. Là khả năng tạo ra sản phẩm như thịt, sữa, trứng.</label>
+                <label><input type="radio" name="q1" value="D"> D. Là sự biến đổi về chất của cơ thể con vật.</label>
+            </div>
+        </div>
+
+        <div class="question" data-ans="C">
+            <p><b>Câu 2:</b> Quá trình gà trống bắt đầu biết gáy là biểu hiện của sự gì?</p>
+            <div class="options">
+                <label><input type="radio" name="q2" value="A"> A. Sự sinh trưởng</label>
+                <label><input type="radio" name="q2" value="B"> B. Khả năng sản xuất</label>
+                <label><input type="radio" name="q2" value="C"> C. Sự phát dục</label>
+                <label><input type="radio" name="q2" value="D"> D. Thể chất</label>
+            </div>
+        </div>
+
+        <div class="question" data-ans="D">
+            <p><b>Câu 3:</b> Khả năng sản xuất của vật nuôi phụ thuộc vào những yếu tố nào?</p>
+            <div class="options">
+                <label><input type="radio" name="q3" value="A"> A. Từng giống vật nuôi.</label>
+                <label><input type="radio" name="q3" value="B"> B. Chế độ chăm sóc, nuôi dưỡng.</label>
+                <label><input type="radio" name="q3" value="C"> C. Đặc điểm cá thể.</label>
+                <label><input type="radio" name="q3" value="D"> D. Cả 3 yếu tố trên.</label>
+            </div>
+        </div>
+    </div>
+
+    <!-- II. Đúng/Sai -->
+    <div class="section">
+        <h2 class="section-title">II. Đúng hay Sai?</h2>
+        <table class="tf-table">
+            <tr>
+                <th>Nhận định</th>
+                <th>Đúng</th>
+                <th>Sai</th>
+            </tr>
+            <tr class="tf-row" data-ans="S">
+                <td>1. Sinh trưởng và phát dục là hai quá trình độc lập, không diễn ra đồng thời.</td>
+                <td><input type="radio" name="tf1" value="D"></td>
+                <td><input type="radio" name="tf1" value="S"></td>
+            </tr>
+            <tr class="tf-row" data-ans="S">
+                <td>2. Khối lượng gà Tre lúc mới nở 20g, 4 tuần tuổi là 77g là biểu hiện của sự phát dục.</td>
+                <td><input type="radio" name="tf2" value="D"></td>
+                <td><input type="radio" name="tf2" value="S"></td>
+            </tr>
+            <tr class="tf-row" data-ans="D">
+                <td>3. Lợn Yorkshire có mức tăng trọng trung bình 590,6 g/ngày là biểu hiện của khả năng sản xuất.</td>
+                <td><input type="radio" name="tf3" value="D"></td>
+                <td><input type="radio" name="tf3" value="S"></td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- III. Điền khuyết -->
+    <div class="section fill-blank">
+        <h2 class="section-title">III. Điền từ còn thiếu</h2>
+        <p>1. <input type="text" id="blank1" data-ans="sinh trưởng"> là sự tích luỹ chất hữu cơ do quá trình trao đổi chất, làm cho cơ thể tăng lên về khối lượng, thể tích.</p>
+        <p>2. <input type="text" id="blank2" data-ans="phát dục"> là quá trình biến đổi về chất của cơ thể, bao gồm sự hình thành và hoàn thiện chức năng của từng cơ quan.</p>
+    </div>
+
+    <!-- IV. Nối cột -->
+    <div class="section">
+        <h2 class="section-title">IV. Nối cột (Chạm vào ý bên trái, sau đó chạm ý tương ứng bên phải)</h2>
+        <p style="font-size: 13px; color: #666; margin-top: -10px;">*Học sinh có thể chọn nối tùy ý. Kết quả đúng/sai sẽ được tính khi Nộp Bài.</p>
+        <div class="matching-container">
+            <div class="match-column" id="left-col">
+                <div class="match-item left-item" data-match="1">1. Khối lượng gà Tre từ 20g lên 186g</div>
+                <div class="match-item left-item" data-match="2">2. Gà trống biết gáy, bò cái động dục</div>
+                <div class="match-item left-item" data-match="3">3. Bò Holstein Friesian cho 4000kg sữa/chu kì</div>
+            </div>
+            <div class="match-column" id="right-col">
+                <div class="match-item right-item" data-match="3">A. Biểu hiện của khả năng sản xuất</div>
+                <div class="match-item right-item" data-match="1">B. Biểu hiện của sự sinh trưởng</div>
+                <div class="match-item right-item" data-match="2">C. Biểu hiện của sự phát dục</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- V. Kéo Thả (Chạm - Đích) -->
+    <div class="section">
+        <h2 class="section-title">V. Xếp khái niệm đúng vị trí (Chạm vào thẻ, sau đó chạm vào ô trống)</h2>
+        <p style="font-size: 13px; color: #666; margin-top: -10px;">*Học sinh có thể chọn đặt thẻ tùy ý. Kết quả đúng/sai sẽ được tính khi Nộp Bài.</p>
+        
+        <div class="drag-objects" id="dragPool">
+            <div class="drag-item" data-id="sx">Khả năng sản xuất</div>
+            <div class="drag-item" data-id="st">Sự sinh trưởng</div>
+            <div class="drag-item" data-id="pd">Sự phát dục</div>
+        </div>
+
+        <div class="drop-zones">
+            <div class="drop-zone" data-accept="st">
+                <span>1. Cơ thể vật nuôi tăng lên về khối lượng, thể tích và kích thước.</span>
+                <div class="drop-content"></div>
+            </div>
+            <div class="drop-zone" data-accept="pd">
+                <span>2. Sự hình thành và hoàn thiện chức năng của từng cơ quan mới.</span>
+                <div class="drop-content"></div>
+            </div>
+            <div class="drop-zone" data-accept="sx">
+                <span>3. Khả năng tạo ra sản phẩm như thịt, trứng, sữa, sức kéo.</span>
+                <div class="drop-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ghi nhớ -->
+    <div class="section" style="background: var(--primary-light); border-radius: 8px;">
+        <h2 class="section-title" style="border-left-color: #fbc02d; color: #f57f17;">💡 Ghi nhớ</h2>
+        <p>- <b>Sinh trưởng:</b> Biến đổi về lượng (to hơn, nặng hơn).</p>
+        <p>- <b>Phát dục:</b> Biến đổi về chất (hoàn thiện chức năng cơ quan).</p>
+        <p>- <b>Khả năng sản xuất:</b> Sản phẩm con vật tạo ra (thịt, sữa, trứng,...), phụ thuộc vào giống, chăm sóc và đặc điểm cá thể.</p>
+    </div>
+
+    <!-- Controls -->
+    <div class="footer">
+        <button class="btn-submit" onclick="submitWork()">Nộp Bài</button>
+        <button class="btn-reset" onclick="location.reload()">Làm Lại</button>
+        <div class="score-board" id="scoreBoard">Điểm của bạn: 0 / 10</div>
+    </div>
+</div>
+
+<div id="toast">Thông báo</div>
+
+<script>
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.innerText = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 1500);
+    }
+
+    // --- Logic Nối Cột ---
+    let selectedLeft = null;
+    let selectedRight = null;
+    const matchColors = ['#bbdefb', '#c8e6c9', '#ffe082', '#ffcdd2', '#e1bee7'];
+    let colorIndex = 0;
+
+    const leftItems = document.querySelectorAll('.left-item');
+    const rightItems = document.querySelectorAll('.right-item');
+
+    leftItems.forEach(item => {
+        item.addEventListener('click', function() {
+            if(this.classList.contains('matched')) return;
+            leftItems.forEach(i => i.classList.remove('selected'));
+            this.classList.add('selected');
+            selectedLeft = this;
+            checkMatch();
+        });
+    });
+
+    rightItems.forEach(item => {
+        item.addEventListener('click', function() {
+            if(this.classList.contains('matched')) return;
+            rightItems.forEach(i => i.classList.remove('selected'));
+            this.classList.add('selected');
+            selectedRight = this;
+            checkMatch();
+        });
+    });
+
+    function checkMatch() {
+        if (selectedLeft && selectedRight) {
+            const color = matchColors[colorIndex % matchColors.length];
+            
+            selectedLeft.classList.add('matched');
+            selectedLeft.style.backgroundColor = color;
+            selectedLeft.style.borderColor = color;
+            selectedLeft.dataset.userChoice = selectedRight.dataset.match;
+            
+            selectedRight.classList.add('matched');
+            selectedRight.style.backgroundColor = color;
+            selectedRight.style.borderColor = color;
+            selectedRight.dataset.userChoice = selectedLeft.dataset.match;
+            
+            colorIndex++;
+            showToast("Đã ghép đôi! 🔗");
+            
+            selectedLeft.classList.remove('selected');
+            selectedRight.classList.remove('selected');
+            selectedLeft = null;
+            selectedRight = null;
+        }
+    }
+
+    // --- Logic Kéo Thả (Chấm điểm sau) ---
+    let selectedDrag = null;
+    const dragItems = document.querySelectorAll('.drag-item');
+    const dropZones = document.querySelectorAll('.drop-zone');
+    const dragPool = document.getElementById('dragPool');
+
+    dragItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.stopPropagation(); // Ngăn sự kiện click lan ra ngoài
+            if(this.style.display === 'none') return;
+            
+            // Nếu click lại chính nó thì huỷ chọn
+            if (this.classList.contains('selected')) {
+                this.classList.remove('selected');
+                selectedDrag = null;
+                dropZones.forEach(z => z.classList.remove('active'));
+                return;
+            }
+
+            dragItems.forEach(i => i.classList.remove('selected'));
+            this.classList.add('selected');
+            selectedDrag = this;
+            dropZones.forEach(z => z.classList.add('active'));
+        });
+    });
+
+    // Cho phép bấm vào khu vực chứa thẻ ban đầu để đưa thẻ trở lại
+    dragPool.addEventListener('click', function() {
+        if (selectedDrag) {
+            this.appendChild(selectedDrag);
+            selectedDrag.classList.remove('selected');
+            dropZones.forEach(z => z.classList.remove('active'));
+            selectedDrag = null;
+        }
+    });
+
+    dropZones.forEach(zone => {
+        zone.addEventListener('click', function() {
+            if (!selectedDrag) return;
+            
+            const contentDiv = this.querySelector('.drop-content');
+            
+            // Nếu ô này đã có thẻ, đẩy thẻ cũ về lại kho ban đầu
+            if (contentDiv.children.length > 0) {
+                const existingItem = contentDiv.children[0];
+                dragPool.appendChild(existingItem);
+            }
+
+            contentDiv.appendChild(selectedDrag);
+            selectedDrag.classList.remove('selected');
+            
+            showToast("Đã đặt thẻ! 📌");
+            
+            dropZones.forEach(z => z.classList.remove('active'));
+            selectedDrag = null;
+        });
+    });
+
+    // --- Chấm Điểm (Submit) ---
+    function submitWork() {
+        let totalScore = 0;
+        const maxScore = 14; 
+        
+        // Trắc nghiệm
+        document.querySelectorAll('.question').forEach(q => {
+            const ans = q.dataset.ans;
+            const radios = q.querySelectorAll('input[type="radio"]');
+            radios.forEach(r => {
+                if (r.checked && r.value === ans) {
+                    totalScore++;
+                    r.parentElement.style.background = '#d4edda'; 
+                } else if (r.checked && r.value !== ans) {
+                    r.parentElement.style.background = '#f8d7da'; 
+                }
+            });
+        });
+
+        // Đúng Sai
+        document.querySelectorAll('.tf-row').forEach(row => {
+            const ans = row.dataset.ans;
+            const checked = row.querySelector('input[type="radio"]:checked');
+            if (checked) {
+                if (checked.value === ans) {
+                    totalScore++;
+                    row.style.backgroundColor = '#d4edda';
+                } else {
+                    row.style.backgroundColor = '#f8d7da';
+                }
+            }
+        });
+
+        // Điền khuyết
+        const blank1 = document.getElementById('blank1');
+        if (blank1.value.trim().toLowerCase() === blank1.dataset.ans) {
+            totalScore++;
+            blank1.style.backgroundColor = '#d4edda';
+        } else {
+            blank1.style.backgroundColor = '#f8d7da';
+            blank1.value = blank1.dataset.ans; 
+        }
+
+        const blank2 = document.getElementById('blank2');
+        if (blank2.value.trim().toLowerCase() === blank2.dataset.ans) {
+            totalScore++;
+            blank2.style.backgroundColor = '#d4edda';
+        } else {
+            blank2.style.backgroundColor = '#f8d7da';
+            blank2.value = blank2.dataset.ans;
+        }
+
+        // Nối cột
+        document.querySelectorAll('.left-item').forEach(item => {
+            if (item.dataset.userChoice) {
+                if (item.dataset.userChoice === item.dataset.match) {
+                    totalScore++;
+                    item.style.border = "3px solid #28a745"; 
+                } else {
+                    item.style.border = "3px solid #dc3545"; 
+                }
+            }
+        });
+        document.querySelectorAll('.right-item').forEach(item => {
+            if (item.dataset.userChoice) {
+                if (item.dataset.userChoice === item.dataset.match) {
+                    item.style.border = "3px solid #28a745";
+                } else {
+                    item.style.border = "3px solid #dc3545";
+                }
+            }
+        });
+
+        // Kiểm tra Kéo thả
+        document.querySelectorAll('.drop-zone').forEach(zone => {
+            const acceptId = zone.dataset.accept;
+            const contentDiv = zone.querySelector('.drop-content');
+            const item = contentDiv.querySelector('.drag-item');
+            
+            if (item) {
+                if (item.dataset.id === acceptId) {
+                    totalScore++;
+                    zone.style.backgroundColor = '#d4edda';
+                    zone.style.borderColor = '#28a745';
+                } else {
+                    zone.style.backgroundColor = '#f8d7da';
+                    zone.style.borderColor = '#dc3545';
+                }
+                // Khóa thẻ không cho click/di chuyển nữa
+                item.style.pointerEvents = 'none';
+            } else {
+                // Ô trống coi như làm sai
+                zone.style.borderColor = '#dc3545';
+            }
+        });
+        
+        // Khóa luôn kho thẻ
+        document.getElementById('dragPool').style.pointerEvents = 'none';
+
+        // Tính thang điểm 10
+        let finalMark = (totalScore / maxScore) * 10;
+        
+        const sb = document.getElementById('scoreBoard');
+        sb.style.display = 'block';
+        sb.innerText = `Điểm của bạn: ${finalMark.toFixed(1)} / 10`;
+        
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>
